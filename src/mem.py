@@ -145,7 +145,3 @@ class Memory:
         self.__buffer[ref] = array
             
             
-
-class MemoryRef:
-    def __init__(self, key_ref: int):
-        pass
