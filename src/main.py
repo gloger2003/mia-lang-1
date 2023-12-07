@@ -4,10 +4,10 @@ from loguru import logger
 from mia import Mia
 
 
-if len(sys.argv) > 1:
-    if sys.argv[1] == 'clear':
+if len(sys.argv) > 2:
+    if sys.argv[2] == 'clear':
         logger.remove()
 
 
-mia = Mia('test.mialang', 50)
+mia = Mia(sys.argv[1], 50)
 mia.main()
