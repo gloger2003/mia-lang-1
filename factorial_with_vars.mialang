@@ -3,7 +3,8 @@ var 0x2 fact 1
 var 0x3 i    1
 var 0x4 step 1
 
-// func ^^
+_ax
+
 defn factorial
     ax  fact
     bx  i
@@ -18,5 +19,4 @@ defn factorial
 
     out fact
 
-// call if n - i > 0
 call factorial 0x9

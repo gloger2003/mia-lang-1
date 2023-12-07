@@ -369,7 +369,74 @@ class ArrayCmd(MiaCommand):
         self._mia.create_array(ref, name, length)
         
         
+class RegArxnCmd(MiaCommand):
+    """
+    Задать значение для регистра BX по адресу из памяти
+    
+    `arxn <array_name>`
+    -
+    >>> arxn arr
+    """
+    
+    ARG1_REQUERED = True
+    ARG2_REQUERED = False
+    
+    def parse_value(self):
+        return super().parse_value()
+    
+    def do(self):
+        name = self.parse_ref(self._t_arg1)
+        self._mia.reg_arxn(name)
+        
+        
+class RegArxiCmd(MiaCommand):
+    """
+    Задать значение для регистра BX по адресу из памяти
+    
+    `arxi <index>`
+    -
+    >>> arxi 10
+    """
+    
+    ARG1_REQUERED = True
+    ARG2_REQUERED = False
+    
+    def parse_value(self):
+        return super().parse_value()
+    
+    def do(self):
+        ref = self.parse_ref(self._t_arg1)
+        try:
+            val = self._mia.get_from_buffer(ref)
+        except KeyError:
+            if ref.isdecimal():
+                val = int(ref)
+        
+        self._mia.reg_arxi(val)
+        
+        
+class PushToArrayItemCmd(MiaCommand):
+    """
+    Задаёт значение в элемент массива: _arxn[_arxi] 
+    
+    `push <value>`
+    -
+    >>> push 10 
+    """
+    
+    def parse_value(self, t):
+        return utils.to_number_value(t)
+    
+    def do(self):
+        val = self.parse_value(self._t_arg1)
+        self._mia.push_value_to_array_item(val)
+       
+        
 class DEV_OutBufCmd(MiaCommand):
+    """
+    DEV_out_buf
+    """
+    
     ARG1_REQUERED = False
     ARG2_REQUERED = False
     ARG3_REQUERED = False
@@ -382,6 +449,10 @@ class DEV_OutBufCmd(MiaCommand):
         
         
 class DEV_OutAssocBufCmd(MiaCommand):
+    """
+    DEV_out_assoc_buf
+    """
+    
     ARG1_REQUERED = False
     ARG2_REQUERED = False
     ARG3_REQUERED = False
@@ -392,7 +463,6 @@ class DEV_OutAssocBufCmd(MiaCommand):
     def do(self):
         self._mia.print_assoc_buf()
         
-
 
 class CmdEnum(enum.Enum):
     alloc = 0
@@ -409,6 +479,10 @@ class CmdEnum(enum.Enum):
     assoc = enum.auto()
     var = enum.auto()
     array = enum.auto()
+    arxn = enum.auto()
+    arxi = enum.auto()
+    push = enum.auto()
+    
     DEV_out_buf = enum.auto()
     DEV_out_assoc_buf = enum.auto()
 
@@ -428,6 +502,10 @@ CMD_MAPPING = {
     CmdEnum.assoc: AssocCmd,
     CmdEnum.var: VarCmd,
     CmdEnum.array: ArrayCmd,
+    CmdEnum.arxn: RegArxnCmd,
+    CmdEnum.arxi: RegArxiCmd,
+    CmdEnum.push: PushToArrayItemCmd,
+    
     CmdEnum.DEV_out_buf: DEV_OutBufCmd,
     CmdEnum.DEV_out_assoc_buf: DEV_OutAssocBufCmd,
 } 

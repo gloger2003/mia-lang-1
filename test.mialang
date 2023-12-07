@@ -1,9 +1,17 @@
 // array <ref> <name> <length>
 
-array 0x1 arr 2
+array 0x1 arr 5
+alloc 0x9 2
+
+var 0x9 a 2
+
+DEV_out_buf
+DEV_out_assoc_buf
+
+arxn arr
+arxi a
+push 20
 
 DEV_out_buf
 
-out arr
-
-DEV_out_assoc_buf
+out _arxv

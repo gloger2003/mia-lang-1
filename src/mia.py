@@ -153,18 +153,35 @@ class FlowMixin:
 class RegistersMixin:
     def reg_ax(self, val):
         self._ax = val
-        logger.debug(f'MIA_CORE::REG_AX | ax={self._ax}')
+        logger.warning(f'MIA_CORE::REG_AX | ax={self._ax}')
         
     def reg_bx(self, val):
         self._bx = val
-        logger.debug(f'MIA_CORE::REG_BX | bx={self._bx}')
+        logger.warning(f'MIA_CORE::REG_BX | bx={self._bx}')
+        
+    def reg_arxn(self, val):
+        assert isinstance(val, str)
+        self._arxn = val
+        logger.warning(f'MIA_CORE::REG_ARXN | arxn={self._arxn}')
+        
+    def reg_arxi(self, val):
+        assert isinstance(val, int)
+        self._arxi = val
+        logger.warning(f'MIA_CORE::REG_ARXI | arxi={self._arxi}')
+        
+    def push_value_to_array_item(self, val):
+        ref = self._arxn
+        array_ref = self._memory.get_value(ref)
+        array_ref.set_value(val, self._arxi)
+        self._arxv = val
+        logger.warning(f'MIA_CORE::PUSH | arr={ref} index={self._arxi} val={val}')
         
     def get_rx(self) -> Union[int, float]:
         return self._rx
     
 
 class Mia(OperationMixin, IOMixin, RegistersMixin, FlowMixin, ErrorsMixin):
-    V = '0.0.10'
+    V = '0.0.12'
 
     def __init__(self, filename: str, memory_size: int):
         self._filename = filename
@@ -176,9 +193,31 @@ class Mia(OperationMixin, IOMixin, RegistersMixin, FlowMixin, ErrorsMixin):
         self._cmd_list: List[cmd.MiaCommand] = []
         self._tokens: List[TokenInfo] = []
         
-        self._ax = None  # var A register
-        self._bx = None  # var B register
-        self._rx = None  # Result register
+        self._ax = 0  # var A register
+        self._bx = 0  # var B register
+        self._rx = 0  # Result register
+        self._arxn = ''  # array_ref name register
+        self._arxi = 0  # array_item[_arxi] register
+        self._arxv = 0  # RES: array_item_val[_arxi]
+        
+    def _is_register_name(self, name: str):
+        mapping = {
+            '_ax': 1,
+            '_bx': 2,
+            '_rx': 3,
+            '_arxn': 4,
+            '_arxi': 5,
+            '_arxv': 6
+        }
+        return bool(mapping.get(name))
+        
+    def try_get_register_value(self, reg_name: str):
+        if not self._is_register_name(reg_name):
+            return None
+        try:
+            return getattr(self, reg_name)
+        except AttributeError:
+            return None
     
     def define_name(self, def_name: str, cmd_index: int):
         self._def_names[def_name] = cmd_index
@@ -193,6 +232,9 @@ class Mia(OperationMixin, IOMixin, RegistersMixin, FlowMixin, ErrorsMixin):
         self._memory.create_array(ref, name, length)
         
     def get_from_buffer(self, ref: str) -> Union[int, float]:
+        val = self.try_get_register_value(ref)
+        if val is not None:
+            return val
         return self._memory.get_value(ref)
         
     def _get_clear_lines(self, tokens: List[TokenInfo]):
@@ -265,6 +307,7 @@ class Mia(OperationMixin, IOMixin, RegistersMixin, FlowMixin, ErrorsMixin):
         # pprint(commands, width=40)
         
         while self._cmd_index < len(lines):
+            logger.debug(commands[self._cmd_index].__class__)
             commands[self._cmd_index].do()
             self._cmd_index += 1
                 

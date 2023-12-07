@@ -35,6 +35,9 @@ class ArrayItem:
         self._index = index
         self._value = None
         
+    def __repr__(self) -> str:
+        return f'{self.__class__}<ref={self._ref} index={self._index} value={self._value} array_ref={self._array_ref._name}>'
+        
     def set_value(self, value):
         self._value = value
         
@@ -60,7 +63,7 @@ class ArrayRef(AssocRef):
 
     def get_item_generator(self):
         start = int(self._ref, 16)
-        for i, k in enumerate(range(start, start + self._length, 1)):
+        for i, k in enumerate(range(start, start + self._length + 1, 1)):
             yield ArrayItem(self, hex(k), i)
         
     def set_value(self, index, value):
@@ -105,8 +108,11 @@ class Memory:
         
     def get_value(self, ref: str) -> Union[int, float]:
         assoc_ref = self.__assoc_buffer.get(ref)
-        
         if assoc_ref is not None:
+            array_ref = self.__buffer.get(assoc_ref)
+            if isinstance(array_ref, ArrayRef):
+                logger.success(f'MEMORY::GET_VAL | array_ref={ref} | val={assoc_ref}')
+                return array_ref
             val = self.__buffer[assoc_ref].get_value()
             logger.success(f'MEMORY::GET_VAL | assoc_ref={ref} | val={val}')
         else:
