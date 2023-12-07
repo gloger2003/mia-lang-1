@@ -1,7 +1,7 @@
-alloc sdgsadasgasdgasdgsdgasdgasdgasdg
 alloc 0x2 1
 defn loop
 ax 0x1
+alloc sdgsadasgasdgasdgsdgasdgasdgasdg
 bx 0x2
 sub 0x1
 outf 0x1

@@ -38,7 +38,8 @@ class ErrorsMixin:
     def print_code_before_error(self, index_line_with_error: int):
         for k in range(index_line_with_error - 1):
             tok = self._tokens[k]
-            print(f'{k + 1}: {tok.line}')
+            print(f'{k + 1}: {tok.line}', end='')
+        print()
             
     def print_code_after_error(self, index_line_with_error: int):
         last_i = 0
