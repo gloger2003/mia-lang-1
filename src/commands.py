@@ -41,13 +41,13 @@ class MiaCommand(ABC):
         return utils.to_ref(t)
     
     def factory(mia, t_cmd: TokenInfo, arg1: TokenInfo, arg2: TokenInfo, cmd_index: int) -> 'MiaCommand':
-        key = MiaCommandsEnum[t_cmd.string]
+        key = CmdEnum[t_cmd.string]
         com: MiaCommand = CMD_MAPPING.get(key)
         return com(mia, t_cmd, arg1, arg2, cmd_index)
     
     
 
-class AllocMiaCommand(MiaCommand):
+class AllocCmd(MiaCommand):
     """
     `alloc <ref> <value>`
     -
@@ -63,7 +63,7 @@ class AllocMiaCommand(MiaCommand):
         self._mia.set_to_buffer(ref, val)
     
 
-class OutMiaCommand(MiaCommand):
+class OutCmd(MiaCommand):
     """
     out <ref>
     >>> out 0x1
@@ -78,7 +78,7 @@ class OutMiaCommand(MiaCommand):
         self._mia.print_val(val)
         
 
-class OutFMiaCommand(MiaCommand):
+class OutFCmd(MiaCommand):
     """
     outf <ref>
     >>> outf 0x1
@@ -93,7 +93,7 @@ class OutFMiaCommand(MiaCommand):
         self._mia.print_ref_val(ref, val)
         
         
-class RegAxMiaCommand(MiaCommand):
+class RegAxCmd(MiaCommand):
     """
     ax <ref>
     >>> ax 0x1
@@ -108,7 +108,7 @@ class RegAxMiaCommand(MiaCommand):
         self._mia.reg_ax(val)
         
 
-class RegBxMiaCommand(MiaCommand):
+class RegBxCmd(MiaCommand):
     """
     bx <ref>
     >>> bx 0x1
@@ -123,7 +123,7 @@ class RegBxMiaCommand(MiaCommand):
         self._mia.reg_bx(val)
         
         
-class SumMiaCommand(MiaCommand):
+class SumCmd(MiaCommand):
     """
     sum -> <ref>
     >>> sum 0x1
@@ -139,7 +139,7 @@ class SumMiaCommand(MiaCommand):
         self._mia.set_to_buffer(ref, val)
         
 
-class SubMiaCommand(MiaCommand):
+class SubCmd(MiaCommand):
     """
     sub -> <ref>
     >>> sub 0x1
@@ -155,7 +155,7 @@ class SubMiaCommand(MiaCommand):
         self._mia.set_to_buffer(ref, val)
         
         
-class MulMiaCommand(MiaCommand):
+class MulCmd(MiaCommand):
     """
     mul -> <ref>
     >>> mul 0x1
@@ -171,7 +171,7 @@ class MulMiaCommand(MiaCommand):
         self._mia.set_to_buffer(ref, val)
         
         
-class DivMiaCommand(MiaCommand):
+class DivCmd(MiaCommand):
     """
     div -> <ref>
     >>> div 0x1
@@ -187,7 +187,7 @@ class DivMiaCommand(MiaCommand):
         self._mia.set_to_buffer(ref, val)
         
 
-class DefNameMiaCommand(MiaCommand):
+class DefNameCmd(MiaCommand):
     """
     defn <str>
     >>> defn foo
@@ -200,7 +200,7 @@ class DefNameMiaCommand(MiaCommand):
         self._mia.add_new_def_name(name, self._cmd_index)
         
         
-class CallDefNameMiaCommand(MiaCommand):
+class CallDefNameCmd(MiaCommand):
     """
     call <str>
     >>> call foo
@@ -213,7 +213,7 @@ class CallDefNameMiaCommand(MiaCommand):
         self._mia.call_if_rx(name)
 
 
-class MiaCommandsEnum(enum.Enum):
+class CmdEnum(enum.Enum):
     alloc = 0
     out = enum.auto()
     ax = enum.auto()
@@ -228,15 +228,15 @@ class MiaCommandsEnum(enum.Enum):
 
     
 CMD_MAPPING = {
-    MiaCommandsEnum.alloc: AllocMiaCommand,
-    MiaCommandsEnum.out: OutMiaCommand,
-    MiaCommandsEnum.ax: RegAxMiaCommand,
-    MiaCommandsEnum.bx: RegBxMiaCommand,
-    MiaCommandsEnum.sum: SumMiaCommand,
-    MiaCommandsEnum.sub: SubMiaCommand,
-    MiaCommandsEnum.div: DivMiaCommand,
-    MiaCommandsEnum.mul: MulMiaCommand,
-    MiaCommandsEnum.outf: OutFMiaCommand,
-    MiaCommandsEnum.defn: DefNameMiaCommand,
-    MiaCommandsEnum.call: CallDefNameMiaCommand,
+    CmdEnum.alloc: AllocCmd,
+    CmdEnum.out: OutCmd,
+    CmdEnum.ax: RegAxCmd,
+    CmdEnum.bx: RegBxCmd,
+    CmdEnum.sum: SumCmd,
+    CmdEnum.sub: SubCmd,
+    CmdEnum.div: DivCmd,
+    CmdEnum.mul: MulCmd,
+    CmdEnum.outf: OutFCmd,
+    CmdEnum.defn: DefNameCmd,
+    CmdEnum.call: CallDefNameCmd,
 } 
