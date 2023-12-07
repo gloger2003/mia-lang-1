@@ -15,12 +15,21 @@ import utils
 
 
 class MiaCommand(ABC):
+    ARG1_REQUERED = False
+    ARG2_REQUERED = False
+    DOCS = 'CMD'
+    
     def __init__(self, mia: 'mia.Mia', t_cmd: TokenInfo, t_arg1: TokenInfo, t_arg2: TokenInfo, cmd_index: int):
         self._t_cmd: TokenInfo = t_cmd
         self._t_arg1: Optional[TokenInfo] = t_arg1
         self._t_arg2: Optional[TokenInfo] = t_arg2
         self._mia = mia
         self._cmd_index = cmd_index
+        
+        if self.ARG1_REQUERED and self._t_arg1 is None:
+            self._mia.print_error_args(self._t_cmd, self.repr_doc())
+        if self.ARG2_REQUERED and self._t_arg2 is None:
+            self._mia.print_error_args(self._t_cmd, self.repr_doc())
     
     def __repr__(self) -> str:
         cmd = self._t_cmd.string
@@ -35,7 +44,10 @@ class MiaCommand(ABC):
     @abstractmethod
     def parse_value(self):
         pass
-    
+
+    def repr_doc(self):
+        return self.__doc__.replace('`', '').replace('-\n','\n')
+
     def parse_ref(self, t: TokenInfo):
         return utils.to_ref(t)
     
@@ -52,6 +64,9 @@ class AllocCmd(MiaCommand):
     >>> alloc 0x1 5
     """
     
+    ARG1_REQUERED = True
+    ARG2_REQUERED = True
+    
     def parse_value(self, t: TokenInfo):
         return utils.to_number_value(t)
     
@@ -63,9 +78,13 @@ class AllocCmd(MiaCommand):
 
 class OutCmd(MiaCommand):
     """
-    out <ref>
+    `out <ref>`
+    -
     >>> out 0x1
     """
+    
+    ARG1_REQUERED = True
+    ARG2_REQUERED = False
     
     def parse_value(self):
         return super().parse_value()
@@ -78,9 +97,12 @@ class OutCmd(MiaCommand):
 
 class OutFCmd(MiaCommand):
     """
-    outf <ref>
+    `outf <ref>`
+    -
     >>> outf 0x1
     """
+    ARG1_REQUERED = True
+    ARG2_REQUERED = False
     
     def parse_value(self):
         return super().parse_value()
@@ -93,9 +115,13 @@ class OutFCmd(MiaCommand):
         
 class RegAxCmd(MiaCommand):
     """
-    ax <ref>
+    `ax <ref>`
+    -
     >>> ax 0x1
     """
+    ARG1_REQUERED = True
+    ARG2_REQUERED = False
+    
     def parse_value(self):
         return super().parse_value()
     
@@ -108,9 +134,14 @@ class RegAxCmd(MiaCommand):
 
 class RegBxCmd(MiaCommand):
     """
-    bx <ref>
+    `bx <ref>`
+    -
     >>> bx 0x1
     """
+    
+    ARG1_REQUERED = True
+    ARG2_REQUERED = False
+    
     def parse_value(self):
         return super().parse_value()
     
@@ -123,9 +154,14 @@ class RegBxCmd(MiaCommand):
         
 class SumCmd(MiaCommand):
     """
-    sum -> <ref>
+    `sum -> <ref>`
+    -
     >>> sum 0x1
     """
+    
+    ARG1_REQUERED = True
+    ARG2_REQUERED = False
+    
     def parse_value(self):
         return super().parse_value()
     
@@ -139,9 +175,14 @@ class SumCmd(MiaCommand):
 
 class SubCmd(MiaCommand):
     """
-    sub -> <ref>
+    `sub -> <ref>`
+    -
     >>> sub 0x1
     """
+    
+    ARG1_REQUERED = True
+    ARG2_REQUERED = False
+    
     def parse_value(self):
         return super().parse_value()
     
@@ -155,9 +196,14 @@ class SubCmd(MiaCommand):
         
 class MulCmd(MiaCommand):
     """
-    mul -> <ref>
+    `mul -> <ref>`
+    -
     >>> mul 0x1
     """
+    
+    ARG1_REQUERED = True
+    ARG2_REQUERED = False
+    
     def parse_value(self):
         return super().parse_value()
     
@@ -171,9 +217,14 @@ class MulCmd(MiaCommand):
         
 class DivCmd(MiaCommand):
     """
-    div -> <ref>
+    `div -> <ref>`
+    -
     >>> div 0x1
     """
+    
+    ARG1_REQUERED = True
+    ARG2_REQUERED = False
+    
     def parse_value(self):
         return super().parse_value()
     
@@ -187,9 +238,14 @@ class DivCmd(MiaCommand):
 
 class DefNameCmd(MiaCommand):
     """
-    defn <str>
+    `defn <str>`
+    -
     >>> defn foo
     """
+    
+    ARG1_REQUERED = True
+    ARG2_REQUERED = False
+    
     def parse_value(self):
         return super().parse_value()
     
@@ -200,9 +256,14 @@ class DefNameCmd(MiaCommand):
         
 class CallDefNameCmd(MiaCommand):
     """
-    call <str>
+    `call <str>`
+    -
     >>> call foo
     """
+    
+    ARG1_REQUERED = True
+    ARG2_REQUERED = False
+    
     def parse_value(self):
         return super().parse_value()
     

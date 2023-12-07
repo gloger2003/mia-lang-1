@@ -32,11 +32,42 @@ class OperationMixin:
         
 
 class IOMixin:
+    ARGS_ERROR = '================= ARGS_ERROR ==============='
+    
     def print_val(self, val):
         print(f'>>> {val}')
         
     def print_ref_val(self, ref, val):
         print(f'>>> [{ref}] = {val}')
+        
+    def print_error_args(self, t: TokenInfo, docs: str):
+        line = t.line.replace("\n", '')
+        i_line = t.start[0]
+        a = len(line)
+        
+        print()
+        for k in range(i_line - 1):
+            tok = self._tokens[k]
+            print(f'{k + 1}: {tok.line}')
+        
+        print(f'{self.ARGS_ERROR} on Line {i_line}\n')
+        print(line)
+        print('^' * a, end='')
+        print(docs)
+        print(f'{self.ARGS_ERROR} on Line {i_line}\n')
+        print('\n')
+        
+        last_i = 0
+        for k in range(i_line + 1, len(self._tokens), 1):
+            tok = self._tokens[k]
+            tok_i = tok.start[0]
+            if tok.type == ENDMARKER:
+                break
+            if tok_i != last_i:
+                print(f'{tok_i}: {tok.line}', end='')
+                last_i = tok_i
+        print('\n')
+        quit()
         
         
 class FlowMixin:
@@ -81,6 +112,8 @@ class Mia(OperationMixin, IOMixin, RegistersMixin, FlowMixin):
         
         self._cmd_index = 0
         self._def_names: Dict[str, int] = {}
+        self._cmd_list: List[cmd.MiaCommand] = []
+        self._tokens: List[TokenInfo] = []
         
         self._ax = None  # var A register
         self._bx = None  # var B register
@@ -140,12 +173,15 @@ class Mia(OperationMixin, IOMixin, RegistersMixin, FlowMixin):
     def main(self):
         tokens = tokenize.tokenize(self.__reader.__next__)
         tokens = [k for k in tokens][1:]
+        self._tokens = tokens.copy()
         
         lines = self.get_clear_lines(tokens)
         commands = self.create_cmd_list(lines)
         
-        # pprint(coms, width=40)
-        # pprint(self.__memory.get_buffer_copy())
+        self._cmd_list = commands
+        
+        pprint(commands, width=40)
+        pprint(self.__memory.get_buffer_copy())
         
         while self._cmd_index < len(lines):
             commands[self._cmd_index].do()
