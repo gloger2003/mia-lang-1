@@ -129,6 +129,7 @@ class IOMixin:
     def print_assoc_buf(self):
         pprint(self._memory.get_assoc_buf_copy(), width=40)
         
+        
 class FlowMixin:
     def cmp_register(self):
         self._rx = self._ax == self._bx
