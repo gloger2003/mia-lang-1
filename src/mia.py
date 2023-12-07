@@ -48,10 +48,14 @@ class FlowMixin:
         logger.warning(f'MIA::SET_CMD_INDEX | index={self._cmd_index}')
     
     def call_if_val(self, def_name, val):
-        pass
+        if val > 0:
+            logger.warning('MIA::CALL_IF_VAL | TRUE')
+            return self.set_cmd_index_from_def_name(def_name)
+        logger.warning('MIA::CALL_IF_VAL | FALSE')
     
     def call_if_rx(self, def_name):
         if self._rx > 0:
+            logger.warning('MIA::CALL_IF_RX | TRUE')
             return self.set_cmd_index_from_def_name(def_name)
         logger.warning('MIA::CALL_IF_RX | FALSE')
 

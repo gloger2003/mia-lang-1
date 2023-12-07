@@ -1,9 +1,8 @@
 from enum import Enum
 import enum
 from pprint import pformat, pprint
-from typing import Dict, List
+from typing import Dict, List, Optional
 import numpy as np
-from queue import LifoQueue
 import tokenize
 from tokenize import NEWLINE, ENDMARKER, TokenInfo
 
@@ -17,9 +16,9 @@ import utils
 
 class MiaCommand(ABC):
     def __init__(self, mia: 'mia.Mia', t_cmd: TokenInfo, t_arg1: TokenInfo, t_arg2: TokenInfo, cmd_index: int):
-        self._t_cmd = t_cmd
-        self._t_arg1 = t_arg1
-        self._t_arg2 = t_arg2
+        self._t_cmd: TokenInfo = t_cmd
+        self._t_arg1: Optional[TokenInfo] = t_arg1
+        self._t_arg2: Optional[TokenInfo] = t_arg2
         self._mia = mia
         self._cmd_index = cmd_index
     
@@ -44,7 +43,6 @@ class MiaCommand(ABC):
         key = CmdEnum[t_cmd.string]
         com: MiaCommand = CMD_MAPPING.get(key)
         return com(mia, t_cmd, arg1, arg2, cmd_index)
-    
     
 
 class AllocCmd(MiaCommand):
@@ -210,7 +208,11 @@ class CallDefNameCmd(MiaCommand):
     
     def do(self):
         name = self._t_arg1.string
-        self._mia.call_if_rx(name)
+        if self._t_arg2 is None:
+            return self._mia.call_if_rx(name)
+        ref = self.parse_ref(self._t_arg2)
+        val = self._mia.get_from_buffer(ref)
+        self._mia.call_if_val(name, val)
 
 
 class CmdEnum(enum.Enum):
