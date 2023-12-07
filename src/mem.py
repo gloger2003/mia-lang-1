@@ -73,12 +73,9 @@ class Memory:
     
     def create_assoc(self, ref: str, name: str):
         assoc = AssocRef(ref, name)
-        print(assoc)
+        
         self.__assoc_buffer[name] = ref
         self.__buffer[ref] = assoc
-        # pprint(self.__assoc_buffer)
-        # pprint(self.__buffer)
-        # self.set_value(name, assoc)
 
     def get_buffer_copy(self) -> Dict:
         return self.__buffer.copy()

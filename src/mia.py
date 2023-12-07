@@ -116,6 +116,13 @@ class IOMixin:
     def print_ref_val(self, ref, val):
         print(f'>>> [{ref}] = {val}')
         
+    def print_welcome(self):
+        print('==================|MiaLang|==================')
+        print(f'= VERSION: {self.V} ')
+        print('=============================================')
+        print('\n')
+        print(':OUT:\n')
+        
         
 class FlowMixin:
     def cmp_register(self):
@@ -152,6 +159,8 @@ class RegistersMixin:
     
 
 class Mia(OperationMixin, IOMixin, RegistersMixin, FlowMixin, ErrorsMixin):
+    V = '0.0.10'
+
     def __init__(self, filename: str, memory_size: int):
         self._filename = filename
         self._reader = open(filename, 'rb')
@@ -227,6 +236,8 @@ class Mia(OperationMixin, IOMixin, RegistersMixin, FlowMixin, ErrorsMixin):
         return coms
         
     def main(self):
+        self.print_welcome()
+        
         tokens = tokenize.tokenize(self._reader.__next__)
         tokens = [k for k in tokens][1:]
         self._tokens = tokens
@@ -236,7 +247,7 @@ class Mia(OperationMixin, IOMixin, RegistersMixin, FlowMixin, ErrorsMixin):
         
         self._cmd_list = commands
         
-        pprint(commands, width=40)
+        # pprint(commands, width=40)
         
         while self._cmd_index < len(lines):
             commands[self._cmd_index].do()
