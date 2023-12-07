@@ -210,6 +210,7 @@ class Mia(OperationMixin, IOMixin, RegistersMixin, FlowMixin, ErrorsMixin):
     def _parse_line_args(self, line: List[TokenInfo]):
         arg1 = None
         arg2 = None
+        arg3 = None
         
         # TODO: refact
         try:
@@ -222,15 +223,20 @@ class Mia(OperationMixin, IOMixin, RegistersMixin, FlowMixin, ErrorsMixin):
         except IndexError:
             pass
         
-        return arg1, arg2
+        try:
+            arg3 = line[3]
+        except IndexError:
+            pass
+        
+        return arg1, arg2, arg3
         
     def _create_cmd_list(self, lines: List[List[TokenInfo]]):
         coms: List[cmd.MiaCommand] = []
         
         for line in lines:
             try:
-                arg1, arg2 = self._parse_line_args(line)
-                coms.append(cmd.MiaCommand.factory(self, line[0], arg1, arg2, len(coms)))
+                arg1, arg2, arg3 = self._parse_line_args(line)
+                coms.append(cmd.MiaCommand.factory(self, line[0], arg1, arg2, arg3, len(coms)))
             except KeyError:
                 self.print_keyword_error(line[0])
         return coms

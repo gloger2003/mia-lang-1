@@ -18,18 +18,29 @@ import utils
 class MiaCommand(ABC):
     ARG1_REQUERED = False
     ARG2_REQUERED = False
+    ARG3_REQUERED = False
+    
     DOCS = 'CMD'
     
-    def __init__(self, mia: 'mia.Mia', t_cmd: TokenInfo, t_arg1: TokenInfo, t_arg2: TokenInfo, cmd_index: int):
+    def __init__(self, 
+                 mia: 'mia.Mia', 
+                 t_cmd: TokenInfo, 
+                 t_arg1: Optional[TokenInfo], 
+                 t_arg2: Optional[TokenInfo], 
+                 t_arg3: Optional[TokenInfo], 
+                 cmd_index: int):
         self._t_cmd: TokenInfo = t_cmd
         self._t_arg1: Optional[TokenInfo] = t_arg1
         self._t_arg2: Optional[TokenInfo] = t_arg2
+        self._t_arg3: Optional[TokenInfo] = t_arg3
         self._mia = mia
         self._cmd_index = cmd_index
         
         if self.ARG1_REQUERED and self._t_arg1 is None:
             self._mia.print_args_error(self._t_cmd, self.repr_doc())
         if self.ARG2_REQUERED and self._t_arg2 is None:
+            self._mia.print_args_error(self._t_cmd, self.repr_doc())
+        if self.ARG3_REQUERED and self._t_arg3 is None:
             self._mia.print_args_error(self._t_cmd, self.repr_doc())
     
     def __repr__(self) -> str:
@@ -55,10 +66,15 @@ class MiaCommand(ABC):
             return utils.to_ref(t)
         return t.string
     
-    def factory(mia, t_cmd: TokenInfo, arg1: TokenInfo, arg2: TokenInfo, cmd_index: int) -> 'MiaCommand':
+    def factory(mia, 
+                t_cmd: TokenInfo, 
+                arg1: Optional[TokenInfo], 
+                arg2: Optional[TokenInfo], 
+                arg3: Optional[TokenInfo], 
+                cmd_index: int) -> 'MiaCommand':
         key = CmdEnum[t_cmd.string]
         com: MiaCommand = CMD_MAPPING.get(key)
-        return com(mia, t_cmd, arg1, arg2, cmd_index)
+        return com(mia, t_cmd, arg1, arg2, arg3, cmd_index)
     
 
 class AllocCmd(MiaCommand):
@@ -291,7 +307,7 @@ class CallDefNameCmd(MiaCommand):
         ref = self.parse_ref(self._t_arg2)
         val = self._mia.get_from_buffer(ref)
         self._mia.call_if_val(name, val)
-        
+             
 
 class AssocCmd(MiaCommand):
     """
@@ -310,6 +326,25 @@ class AssocCmd(MiaCommand):
         ref = self.parse_ref(self._t_arg1)
         name = self._t_arg2.string
         self._mia.create_assoc(ref, name)
+        
+
+class VarCmd(MiaCommand):
+    """
+    `var <ref> <name> <value>`
+    -
+    >>> var 0x1 a 10
+    """
+    
+    def parse_value(self, t: TokenInfo):
+        return utils.to_number_value(t)
+    
+    def do(self):
+        ref = self.parse_ref(self._t_arg1)
+        name = self._t_arg2.string
+        value = self.parse_value(self._t_arg3)
+        
+        self._mia.create_assoc(ref, name)
+        self._mia.set_to_buffer(name, value)
 
 
 class CmdEnum(enum.Enum):
@@ -325,6 +360,7 @@ class CmdEnum(enum.Enum):
     defn = enum.auto()
     call = enum.auto()
     assoc = enum.auto()
+    var = enum.auto()
 
     
 CMD_MAPPING = {
@@ -340,4 +376,5 @@ CMD_MAPPING = {
     CmdEnum.defn: DefNameCmd,
     CmdEnum.call: CallDefNameCmd,
     CmdEnum.assoc: AssocCmd,
+    CmdEnum.var: VarCmd,
 } 
