@@ -60,6 +60,8 @@ class MiaCommand(ABC):
 
 class AllocCmd(MiaCommand):
     """
+    Размещение значения в памяти по адресу
+    
     `alloc <ref> <value>`
     -
     >>> alloc 0x1 5
@@ -79,6 +81,8 @@ class AllocCmd(MiaCommand):
 
 class OutCmd(MiaCommand):
     """
+    Вывод значения по адресу из памяти в консоль 
+    
     `out <ref>`
     -
     >>> out 0x1
@@ -98,6 +102,8 @@ class OutCmd(MiaCommand):
 
 class OutFCmd(MiaCommand):
     """
+    Вывод [адреса]=[значение] по адресу из памяти в консоль
+    
     `outf <ref>`
     -
     >>> outf 0x1
@@ -116,6 +122,8 @@ class OutFCmd(MiaCommand):
         
 class RegAxCmd(MiaCommand):
     """
+    Задать значение для регистра AX по адресу из памяти
+    
     `ax <ref>`
     -
     >>> ax 0x1
@@ -135,6 +143,8 @@ class RegAxCmd(MiaCommand):
 
 class RegBxCmd(MiaCommand):
     """
+    Задать значение для регистра BX по адресу из памяти
+    
     `bx <ref>`
     -
     >>> bx 0x1
