@@ -11,6 +11,6 @@ iskeyword = frozenset(kwlist).__contains__
 
 
 mia = Mia('test.mialang', 10)
-
+mia.main()
     
     

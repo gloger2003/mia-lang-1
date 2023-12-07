@@ -16,11 +16,12 @@ import utils
 
 
 class MiaCommand(ABC):
-    def __init__(self, mia: 'mia.Mia', t_cmd: TokenInfo, t_arg1: TokenInfo, t_arg2: TokenInfo):
+    def __init__(self, mia: 'mia.Mia', t_cmd: TokenInfo, t_arg1: TokenInfo, t_arg2: TokenInfo, cmd_index: int):
         self._t_cmd = t_cmd
         self._t_arg1 = t_arg1
         self._t_arg2 = t_arg2
         self._mia = mia
+        self._cmd_index = cmd_index
     
     def __repr__(self) -> str:
         cmd = self._t_cmd.string
@@ -39,10 +40,10 @@ class MiaCommand(ABC):
     def parse_ref(self, t: TokenInfo):
         return utils.to_ref(t)
     
-    def factory(mia, t_cmd: TokenInfo, arg1: TokenInfo, arg2: TokenInfo) -> 'MiaCommand':
+    def factory(mia, t_cmd: TokenInfo, arg1: TokenInfo, arg2: TokenInfo, cmd_index: int) -> 'MiaCommand':
         key = MiaCommandsEnum[t_cmd.string]
         com: MiaCommand = CMD_MAPPING.get(key)
-        return com(mia, t_cmd, arg1, arg2)
+        return com(mia, t_cmd, arg1, arg2, cmd_index)
     
     
 
@@ -184,6 +185,32 @@ class DivMiaCommand(MiaCommand):
         
         val = self._mia.get_rx()
         self._mia.set_to_buffer(ref, val)
+        
+
+class DefNameMiaCommand(MiaCommand):
+    """
+    defn <str>
+    >>> defn foo
+    """
+    def parse_value(self):
+        return super().parse_value()
+    
+    def do(self):
+        name = self._t_arg1.string
+        self._mia.add_new_def_name(name, self._cmd_index)
+        
+        
+class CallDefNameMiaCommand(MiaCommand):
+    """
+    call <str>
+    >>> call foo
+    """
+    def parse_value(self):
+        return super().parse_value()
+    
+    def do(self):
+        name = self._t_arg1.string
+        self._mia.call_if_rx(name)
 
 
 class MiaCommandsEnum(enum.Enum):
@@ -196,6 +223,8 @@ class MiaCommandsEnum(enum.Enum):
     div = enum.auto()
     mul = enum.auto()
     outf = enum.auto()
+    defn = enum.auto()
+    call = enum.auto()
 
     
 CMD_MAPPING = {
@@ -208,4 +237,6 @@ CMD_MAPPING = {
     MiaCommandsEnum.div: DivMiaCommand,
     MiaCommandsEnum.mul: MulMiaCommand,
     MiaCommandsEnum.outf: OutFMiaCommand,
+    MiaCommandsEnum.defn: DefNameMiaCommand,
+    MiaCommandsEnum.call: CallDefNameMiaCommand,
 } 
