@@ -75,7 +75,6 @@ class ErrorsMixin:
         
     def _print_error(self, err_const: str, t: TokenInfo, docs: str):
         index_line_with_error = t.start[0]
-        print(t)
         print()
         self.print_code_before_error(index_line_with_error)
         self.print_body_error(err_const, t, docs)
@@ -87,8 +86,11 @@ class ErrorsMixin:
         quit()
         
     def print_keyword_error(self, t: TokenInfo):
-        print(t)
-        docs = '\n'.join([k.repr_doc() for k in cmd.CMD_MAPPING.values()])
+        def gen_doc(x):
+            return x + ('_' * 50)
+        
+        docs = '\n'.join([gen_doc(k.repr_doc()) for k in cmd.CMD_MAPPING.values()])
+        docs = ('_' * 50) + '\n' + docs
         self._print_error(self.KEYWORD_ERROR, t, docs)
         quit()
 
