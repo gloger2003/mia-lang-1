@@ -105,6 +105,22 @@ class RegBxMiaCommand(MiaCommand):
         val = self._mia.get_from_buffer(ref)
         
         self._mia.reg_bx(val)
+        
+        
+class SumMiaCommand(MiaCommand):
+    """
+    sum -> <ref>
+    >>> sum 0x1
+    """
+    def parse_value(self):
+        return super().parse_value()
+    
+    def do(self):
+        ref = self.parse_ref(self._t_arg1)
+        self._mia.sum_registers()
+        
+        val = self._mia.get_rx()
+        self._mia.set_to_buffer(ref, val)
 
 
 class MiaCommandsEnum(enum.Enum):
@@ -112,6 +128,7 @@ class MiaCommandsEnum(enum.Enum):
     out = 1
     ax = 2
     bx = 3
+    sum = 4
 
     
 CMD_MAPPING = {
@@ -119,4 +136,5 @@ CMD_MAPPING = {
     MiaCommandsEnum.out: OutMiaCommand,
     MiaCommandsEnum.ax: RegAxMiaCommand,
     MiaCommandsEnum.bx: RegBxMiaCommand,
+    MiaCommandsEnum.sum: SumMiaCommand,
 } 

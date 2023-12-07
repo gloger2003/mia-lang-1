@@ -13,14 +13,21 @@ import commands as cmd
 import mem
 
 
-class Mia:
+class OperationMixin:
+    def sum_registers(self):
+        self._rx = self._ax + self._bx
+        logger.warning(self._rx)
+
+
+class Mia(OperationMixin):
     def __init__(self, filename: str, memory_size: int):
         self.__filename = filename
         self.__reader = open(filename, 'rb')
         self.__memory = mem.Memory(memory_size)
         
-        self._ax = None
-        self._bx = None
+        self._ax = None  # var A register
+        self._bx = None  # var B register
+        self._rx = None  # Result register
         
         self.main()
         
@@ -35,9 +42,14 @@ class Mia:
         
     def reg_ax(self, val):
         self._ax = val
+        logger.debug(f'MIA_CORE::REG_AX | ax={self._ax}')
         
     def reg_bx(self, val):
         self._bx = val
+        logger.debug(f'MIA_CORE::REG_BX | bx={self._bx}')
+        
+    def get_rx(self) -> Union[int, float]:
+        return self._rx
         
     def main(self):
         tokens = tokenize.tokenize(self.__reader.__next__)
@@ -76,7 +88,10 @@ class Mia:
             
             coms.append(cmd.MiaCommand.factory(self, line[0], arg1, arg2))
             
+        pprint(coms, width=40)
+        pprint(self.__memory.get_buffer_copy())
+        
+        print('\n\n[::OUT::]\n')
         for com in coms:
             com.do()
                 
-        pprint(coms, width=40)

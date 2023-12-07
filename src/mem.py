@@ -30,10 +30,14 @@ class Memory:
         self.__buffer[ref]
         self.__buffer[ref] = val
         logger.success(f'MEMORY::SET_VAL | ref={ref} | val={val}')
-        pprint(self.__buffer)
         
     def get_val(self, ref: str) -> Union[int, float]:
-        return self.__buffer[ref]
+        val = self.__buffer[ref]
+        logger.success(f'MEMORY::GET_VAL | ref={ref} | val={val}')
+        return val
+
+    def get_buffer_copy(self) -> Dict:
+        return self.__buffer.copy()
 
 
 class MemoryRef:
