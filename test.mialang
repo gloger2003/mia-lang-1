@@ -1,5 +1,17 @@
 assoc 0x1 a
-alloc a 10
+alloc a 100
 
-fff
-out a
+assoc 0x2 b
+alloc b 1
+
+assoc 0x5 res
+
+ax a
+
+defn loop
+    bx b
+    sub res
+    out res
+    ax res
+    
+call loop res

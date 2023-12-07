@@ -1,5 +1,5 @@
 from pprint import pformat, pprint
-from token import NL
+from token import DEDENT, INDENT, NL
 from typing import Dict, List, Union
 import numpy as np
 from queue import LifoQueue
@@ -192,7 +192,7 @@ class Mia(OperationMixin, IOMixin, RegistersMixin, FlowMixin, ErrorsMixin):
         nl_indexes = []
         i = 0
         for t in tokens:
-            if t.type == NEWLINE or t.type == NL:
+            if t.type in (NEWLINE, NL, INDENT, DEDENT):
                 nl_indexes.append(i)
             i += 1
             
@@ -243,6 +243,7 @@ class Mia(OperationMixin, IOMixin, RegistersMixin, FlowMixin, ErrorsMixin):
         self._tokens = tokens
         
         lines = self._get_clear_lines(tokens)
+        pprint(lines, width=40)
         commands = self._create_cmd_list(lines)
         
         self._cmd_list = commands
