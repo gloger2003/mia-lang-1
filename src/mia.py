@@ -243,7 +243,7 @@ class Mia(OperationMixin, IOMixin, RegistersMixin, FlowMixin, ErrorsMixin):
         self._tokens = tokens
         
         lines = self._get_clear_lines(tokens)
-        pprint(lines, width=40)
+        # pprint(lines, width=40)
         commands = self._create_cmd_list(lines)
         
         self._cmd_list = commands

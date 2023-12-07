@@ -10,7 +10,6 @@ alloc i 1
 assoc 0x4 step
 alloc step 1
 
-var 0x1 a 10
 
 defn factorial
     ax fact

@@ -9,5 +9,5 @@ if len(sys.argv) > 1:
         logger.remove()
 
 
-mia = Mia('test.mialang', 20)
+mia = Mia('test.mialang', 50)
 mia.main()
