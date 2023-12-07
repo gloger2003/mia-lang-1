@@ -76,6 +76,21 @@ class OutMiaCommand(MiaCommand):
         val = self._mia.get_from_buffer(ref)
         self._mia.print_val(val)
         
+
+class OutFMiaCommand(MiaCommand):
+    """
+    outf <ref>
+    >>> outf 0x1
+    """
+    
+    def parse_value(self):
+        return super().parse_value()
+    
+    def do(self):
+        ref = self.parse_ref(self._t_arg1)
+        val = self._mia.get_from_buffer(ref)
+        self._mia.print_ref_val(ref, val)
+        
         
 class RegAxMiaCommand(MiaCommand):
     """
@@ -180,7 +195,7 @@ class MiaCommandsEnum(enum.Enum):
     sub = enum.auto()
     div = enum.auto()
     mul = enum.auto()
-    
+    outf = enum.auto()
 
     
 CMD_MAPPING = {
@@ -192,4 +207,5 @@ CMD_MAPPING = {
     MiaCommandsEnum.sub: SubMiaCommand,
     MiaCommandsEnum.div: DivMiaCommand,
     MiaCommandsEnum.mul: MulMiaCommand,
+    MiaCommandsEnum.outf: OutFMiaCommand,
 } 

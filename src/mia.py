@@ -52,6 +52,9 @@ class Mia(OperationMixin):
     def print_val(self, val):
         print(f'>>> {val}')
         
+    def print_ref_val(self, ref, val):
+        print(f'>>> [{ref}] = {val}')
+        
     def reg_ax(self, val):
         self._ax = val
         logger.debug(f'MIA_CORE::REG_AX | ax={self._ax}')
