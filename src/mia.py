@@ -181,7 +181,7 @@ class RegistersMixin:
     
 
 class Mia(OperationMixin, IOMixin, RegistersMixin, FlowMixin, ErrorsMixin):
-    V = '0.0.12'
+    V = '0.0.15'
 
     def __init__(self, filename: str, memory_size: int):
         self._filename = filename
