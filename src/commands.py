@@ -428,7 +428,10 @@ class PushToArrayItemCmd(MiaCommand):
         return utils.to_number_value(t)
     
     def do(self):
-        val = self.parse_value(self._t_arg1)
+        try:
+            val = self.parse_value(self._t_arg1)
+        except ValueError:
+            val = self._mia.get_from_buffer(self._t_arg1.string)
         self._mia.push_value_to_array_item(val)
        
         

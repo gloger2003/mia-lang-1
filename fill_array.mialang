@@ -1,0 +1,23 @@
+var 0x1 i 0
+var 0x2 n 10
+var 0x3 step 1
+
+array 0x4 arr 10
+
+arxn arr
+
+defn push_item
+    arxi i
+    push i
+
+    ax i
+    bx step
+    sum i
+   
+    ax n
+    bx i
+    sub 0x20
+
+    out _arxv
+
+call push_item 0x20 
