@@ -123,6 +123,11 @@ class IOMixin:
         print('\n')
         print(':OUT:\n')
         
+    def print_buf(self):
+        pprint(self._memory.get_buf_copy(), width=40)
+        
+    def print_assoc_buf(self):
+        pprint(self._memory.get_assoc_buf_copy(), width=40)
         
 class FlowMixin:
     def cmp_register(self):
@@ -183,6 +188,9 @@ class Mia(OperationMixin, IOMixin, RegistersMixin, FlowMixin, ErrorsMixin):
         
     def create_assoc(self, ref: str, name: str):
         self._memory.create_assoc(ref, name)
+        
+    def create_array(self, ref: str, name: str, length: int):
+        self._memory.create_array(ref, name, length)
         
     def get_from_buffer(self, ref: str) -> Union[int, float]:
         return self._memory.get_value(ref)

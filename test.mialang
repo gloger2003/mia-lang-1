@@ -1,2 +1,9 @@
-var 0x1 a 10
-out 0x1
+// array <ref> <name> <length>
+
+array 0x1 arr 2
+
+DEV_out_buf
+
+out arr
+
+DEV_out_assoc_buf

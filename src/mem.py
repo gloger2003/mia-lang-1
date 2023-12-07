@@ -19,13 +19,56 @@ class AssocRef:
         self._value = None
         
     def __repr__(self) -> str:
-        return f'AssocRef<ref={self._ref} name={self._name} value={self._value}>'
+        return f'{self.__class__}<ref={self._ref} name={self._name} value={self._value}>'
         
     def set_value(self, val):
         self._value = val
         
     def get_value(self):
         return self._value
+    
+    
+class ArrayItem:
+    def __init__(self, array_ref: 'ArrayRef', ref: str, index: int):
+        self._array_ref = array_ref
+        self._ref = ref
+        self._index = index
+        self._value = None
+        
+    def set_value(self, value):
+        self._value = value
+        
+    def get_value(self):
+        return self._value
+    
+    def reg_me(self):
+        self._array_ref.reg_array_item(self)
+        
+    def get_ref(self) -> str:
+        return self._ref
+
+
+class ArrayRef(AssocRef):
+    def __init__(self, ref: str, name: str, length: int):
+        super().__init__(ref, name)
+        self._length = length
+        
+        self._array_values: List[ArrayItem] = []
+        
+    def reg_array_item(self, item: ArrayItem):
+        self._array_values.append(item)
+
+    def get_item_generator(self):
+        start = int(self._ref, 16)
+        for i, k in enumerate(range(start, start + self._length, 1)):
+            yield ArrayItem(self, hex(k), i)
+        
+    def set_value(self, index, value):
+        pass
+    
+    def get_value(self, index=None):
+        if index is None:
+            return [k.get_value() for k in self._array_values] 
 
 
 class Memory:
@@ -77,9 +120,25 @@ class Memory:
         self.__assoc_buffer[name] = ref
         self.__buffer[ref] = assoc
 
-    def get_buffer_copy(self) -> Dict:
+    def get_buf_copy(self) -> Dict:
         return self.__buffer.copy()
+    
+    def get_assoc_buf_copy(self) -> Dict:
+        return self.__assoc_buffer.copy()
 
+    def create_array(self, ref: str, name: str, length: int):
+        array = ArrayRef(ref, name, length)
+        
+        for item in array.get_item_generator():
+            item_ref = item.get_ref()
+            # TODO: check buffer
+            self.__buffer[item_ref] = item
+            item.reg_me()
+
+        self.__assoc_buffer[name] = ref
+        self.__buffer[ref] = array
+            
+            
 
 class MemoryRef:
     def __init__(self, key_ref: int):

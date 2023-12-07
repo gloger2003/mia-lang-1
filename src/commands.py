@@ -345,6 +345,53 @@ class VarCmd(MiaCommand):
         
         self._mia.create_assoc(ref, name)
         self._mia.set_to_buffer(name, value)
+        
+
+class ArrayCmd(MiaCommand):
+    """
+    `array <ref> <name> <length>`
+    -
+    >>> array 0x1 arr 2
+    """
+    
+    ARG1_REQUERED = True
+    ARG2_REQUERED = True
+    ARG3_REQUERED = True
+    
+    def parse_value(self, t):
+        return utils.to_number_value(t)
+
+    def do(self):
+        ref = self.parse_ref(self._t_arg1)
+        name = self._t_arg2.string
+        length = self.parse_value(self._t_arg3)
+
+        self._mia.create_array(ref, name, length)
+        
+        
+class DEV_OutBufCmd(MiaCommand):
+    ARG1_REQUERED = False
+    ARG2_REQUERED = False
+    ARG3_REQUERED = False
+    
+    def parse_value(self):
+        return super().parse_value()
+    
+    def do(self):
+        self._mia.print_buf()
+        
+        
+class DEV_OutAssocBufCmd(MiaCommand):
+    ARG1_REQUERED = False
+    ARG2_REQUERED = False
+    ARG3_REQUERED = False
+    
+    def parse_value(self):
+        return super().parse_value()
+    
+    def do(self):
+        self._mia.print_assoc_buf()
+        
 
 
 class CmdEnum(enum.Enum):
@@ -361,6 +408,9 @@ class CmdEnum(enum.Enum):
     call = enum.auto()
     assoc = enum.auto()
     var = enum.auto()
+    array = enum.auto()
+    DEV_out_buf = enum.auto()
+    DEV_out_assoc_buf = enum.auto()
 
     
 CMD_MAPPING = {
@@ -377,4 +427,7 @@ CMD_MAPPING = {
     CmdEnum.call: CallDefNameCmd,
     CmdEnum.assoc: AssocCmd,
     CmdEnum.var: VarCmd,
+    CmdEnum.array: ArrayCmd,
+    CmdEnum.DEV_out_buf: DEV_OutBufCmd,
+    CmdEnum.DEV_out_assoc_buf: DEV_OutAssocBufCmd,
 } 
