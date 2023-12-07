@@ -45,8 +45,9 @@ class MiaCommand(ABC):
     def parse_value(self):
         pass
 
-    def repr_doc(self):
-        return self.__doc__.replace('`', '').replace('-\n','\n')
+    @classmethod
+    def repr_doc(cls):
+        return cls.__doc__.replace('`', '').replace('-\n','\n')
 
     def parse_ref(self, t: TokenInfo):
         return utils.to_ref(t)

@@ -34,24 +34,27 @@ class OperationMixin:
 
 
 class ErrorsMixin:
-    ARGS_ERROR = '================= ARGS_ERROR ==============='
+    ARGS_ERROR = '================= ARGS_ERROR ================='
+    KEYWORD_ERROR = '================= KEYWORD_ERROR ================='
     
     def print_code_before_error(self, index_line_with_error: int):
-        for k in range(index_line_with_error - 1):
-            tok = self._tokens[k]
-            print(f'{k + 1}: {tok.line}', end='')
+        cur_line = 0
+        for tok in self._tokens:
+            if tok.start[0] < index_line_with_error:
+                if cur_line != tok.start[0]:
+                    print(f'{tok.start[0]}: {tok.line}', end='')
+                    cur_line = tok.start[0]
         print()
             
     def print_code_after_error(self, index_line_with_error: int):
-        last_i = 0
-        for k in range(index_line_with_error + 1, len(self._tokens), 1):
-            tok = self._tokens[k]
-            tok_i = tok.start[0]
-            if tok.type == ENDMARKER:
-                break
-            if tok_i != last_i:
-                print(f'{tok_i}: {tok.line}', end='')
-                last_i = tok_i
+        cur_line = 0
+        for tok in self._tokens:
+            if tok.start[0] >= index_line_with_error + 1:
+                if tok.type == ENDMARKER:
+                    break
+                if cur_line != tok.start[0]:
+                    print(f'{tok.start[0]}: {tok.line}', end='')
+                    cur_line = tok.start[0]
             
     def print_body_error(self, err_const: str, t: TokenInfo, docs: str):
         line = t.line.replace("\n", '')
@@ -72,14 +75,21 @@ class ErrorsMixin:
         
     def _print_error(self, err_const: str, t: TokenInfo, docs: str):
         index_line_with_error = t.start[0]
+        print(t)
         print()
         self.print_code_before_error(index_line_with_error)
         self.print_body_error(err_const, t, docs)
         self.print_code_after_error(index_line_with_error)
-        print('\n')
+        print('')
     
     def print_error_args(self, t: TokenInfo, docs: str):
         self._print_error(self.ARGS_ERROR, t, docs)
+        quit()
+        
+    def print_keyword_error(self, t: TokenInfo):
+        print(t)
+        docs = '\n'.join([k.repr_doc() for k in cmd.CMD_MAPPING.values()])
+        self._print_error(self.KEYWORD_ERROR, t, docs)
         quit()
 
 
@@ -190,16 +200,17 @@ class Mia(OperationMixin, IOMixin, RegistersMixin, FlowMixin, ErrorsMixin):
         coms: List[cmd.MiaCommand] = []
         
         for line in lines:
-            if line[0].type == NL:
-                line 
-            arg1, arg2 = self.parse_line_args(line)
-            coms.append(cmd.MiaCommand.factory(self, line[0], arg1, arg2, len(coms)))
+            try:
+                arg1, arg2 = self.parse_line_args(line)
+                coms.append(cmd.MiaCommand.factory(self, line[0], arg1, arg2, len(coms)))
+            except KeyError:
+                self.print_keyword_error(line[0])
         return coms
         
     def main(self):
         tokens = tokenize.tokenize(self.__reader.__next__)
         tokens = [k for k in tokens][1:]
-        self._tokens = tokens.copy()
+        self._tokens = tokens
         
         lines = self.get_clear_lines(tokens)
         commands = self.create_cmd_list(lines)
