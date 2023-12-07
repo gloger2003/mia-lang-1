@@ -22,3 +22,6 @@ def to_number_value(t: TokenInfo) -> Union[int, float]:
 
 def to_ref(t: TokenInfo) -> str:
     return hex(int(t.string, 16))
+
+def is_hex_ref(t: TokenInfo) -> bool:
+    return t.string.startswith('0x')

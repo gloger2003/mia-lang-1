@@ -50,7 +50,9 @@ class MiaCommand(ABC):
         return cls.__doc__.replace('`', '').replace('-\n','\n')
 
     def parse_ref(self, t: TokenInfo):
-        return utils.to_ref(t)
+        if utils.is_hex_ref(t):
+            return utils.to_ref(t)
+        return t.string
     
     def factory(mia, t_cmd: TokenInfo, arg1: TokenInfo, arg2: TokenInfo, cmd_index: int) -> 'MiaCommand':
         key = CmdEnum[t_cmd.string]
@@ -262,7 +264,7 @@ class DefNameCmd(MiaCommand):
     
     def do(self):
         name = self._t_arg1.string
-        self._mia.add_new_def_name(name, self._cmd_index)
+        self._mia.define_name(name, self._cmd_index)
         
         
 class CallDefNameCmd(MiaCommand):
@@ -285,6 +287,25 @@ class CallDefNameCmd(MiaCommand):
         ref = self.parse_ref(self._t_arg2)
         val = self._mia.get_from_buffer(ref)
         self._mia.call_if_val(name, val)
+        
+
+class AssocCmd(MiaCommand):
+    """
+    `assoc <ref> <name>`
+    -
+    >>> assoc 0x1 a
+    """
+    
+    ARG1_REQUERED = True
+    ARG2_REQUERED = True
+    
+    def parse_value(self):
+        return super().parse_value()
+    
+    def do(self):
+        ref = self.parse_ref(self._t_arg1)
+        name = self._t_arg2.string
+        self._mia.create_assoc(ref, name)
 
 
 class CmdEnum(enum.Enum):
@@ -299,6 +320,7 @@ class CmdEnum(enum.Enum):
     outf = enum.auto()
     defn = enum.auto()
     call = enum.auto()
+    assoc = enum.auto()
 
     
 CMD_MAPPING = {
@@ -313,4 +335,5 @@ CMD_MAPPING = {
     CmdEnum.outf: OutFCmd,
     CmdEnum.defn: DefNameCmd,
     CmdEnum.call: CallDefNameCmd,
+    CmdEnum.assoc: AssocCmd,
 } 

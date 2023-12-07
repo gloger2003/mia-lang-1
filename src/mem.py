@@ -12,29 +12,73 @@ from loguru import logger
 import commands as cmd
 
 
+class AssocRef:
+    def __init__(self, ref: str, name: str):
+        self._ref = ref
+        self._name = name
+        self._value = None
+        
+    def __repr__(self) -> str:
+        return f'AssocRef ref={self._ref} name={self._name} value={self._value}'
+        
+    def set_value(self, val):
+        self._value = val
+        
+    def get_value(self):
+        return self._value
+
+
 class Memory:
     def __init__(self, size: int = 10):
+        assert size % 2 == 0
         self.__size = size
         self.__buffer: Dict[int, str] = {}
+        self.__assoc_buffer: Dict[str, int] = {}
 
         self.fill_memory()
 
     def fill_memory(self):
-        self.__buffer = {hex(k): None for k in range(self.__size)}
+        self.__buffer = {hex(k): None for k in range(int(self.__size / 2))}
+        # self.__assoc_buffer = {None: hex(k) for k in range(int(self.__size / 2))}
         logger.debug(self.__buffer)
+        logger.debug(self.__assoc_buffer)
         
     def check_ref(self, ref: str):
         pass
         
-    def set_val(self, ref: str, val: Union[int, float]):
-        self.__buffer[ref]
-        self.__buffer[ref] = val
-        logger.success(f'MEMORY::SET_VAL | ref={ref} | val={val}')
+    def set_value(self, ref: str, val: Union[int, float]):
+        assoc_ref = self.__assoc_buffer.get(ref)
         
-    def get_val(self, ref: str) -> Union[int, float]:
-        val = self.__buffer[ref]
-        logger.success(f'MEMORY::GET_VAL | ref={ref} | val={val}')
+        # TODO: refact
+        if assoc_ref is not None:
+            assoc = self.__buffer[assoc_ref]
+            assoc.set_value(val)
+            logger.success(f'MEMORY::SET_VAL | assoc_ref={assoc_ref} | val={val}')
+        else:
+            assert isinstance(self.__buffer[ref], AssocRef)
+            
+            self.__buffer[ref] = val
+            logger.success(f'MEMORY::SET_VAL | ref={ref} | val={val}')
+        
+    def get_value(self, ref: str) -> Union[int, float]:
+        assoc_ref = self.__assoc_buffer.get(ref)
+        
+        if assoc_ref is not None:
+            val = self.__buffer[assoc_ref].get_value()
+            logger.success(f'MEMORY::GET_VAL | assoc_ref={ref} | val={val}')
+        else:
+            val = self.__buffer[ref]
+            logger.success(f'MEMORY::GET_VAL | ref={ref} | val={val}')
         return val
+    
+    def create_assoc(self, ref: str, name: str):
+        assoc = AssocRef(ref, name)
+        print(assoc)
+        self.__assoc_buffer[name] = ref
+        self.__buffer[ref] = assoc
+        # pprint(self.__assoc_buffer)
+        # pprint(self.__buffer)
+        # self.set_value(name, assoc)
 
     def get_buffer_copy(self) -> Dict:
         return self.__buffer.copy()

@@ -32,7 +32,6 @@ class OperationMixin:
         logger.warning(f'MIA::_RX={self._rx}')
         
 
-
 class ErrorsMixin:
     ARGS_ERROR = '================= ARGS_ERROR ================='
     KEYWORD_ERROR = '================= KEYWORD_ERROR ================='
@@ -89,7 +88,12 @@ class ErrorsMixin:
         def gen_doc(x):
             return x + ('_' * 50)
         
-        docs = '\n'.join([gen_doc(k.repr_doc()) for k in cmd.CMD_MAPPING.values()])
+        docs = '\n'.join(
+            [
+                gen_doc(k.repr_doc())
+                for k in cmd.CMD_MAPPING.values()
+            ]
+        )
         docs = ('_' * 50) + '\n' + docs
         self._print_error(self.KEYWORD_ERROR, t, docs)
         quit()
@@ -152,16 +156,19 @@ class Mia(OperationMixin, IOMixin, RegistersMixin, FlowMixin, ErrorsMixin):
         self._bx = None  # var B register
         self._rx = None  # Result register
     
-    def add_new_def_name(self, def_name: str, cmd_index: int):
+    def define_name(self, def_name: str, cmd_index: int):
         self._def_names[def_name] = cmd_index
         
     def set_to_buffer(self, ref: str, val: Union[int, float]):
-        self.__memory.set_val(ref, val)
+        self.__memory.set_value(ref, val)
+        
+    def create_assoc(self, ref: str, name: str):
+        self.__memory.create_assoc(ref, name)
         
     def get_from_buffer(self, ref: str) -> Union[int, float]:
-        return self.__memory.get_val(ref)
+        return self.__memory.get_value(ref)
         
-    def get_clear_lines(self, tokens: List[TokenInfo]):
+    def _get_clear_lines(self, tokens: List[TokenInfo]):
         # TODO: refact
         nl_indexes = []
         i = 0
@@ -181,7 +188,7 @@ class Mia(OperationMixin, IOMixin, RegistersMixin, FlowMixin, ErrorsMixin):
             
         return lines
     
-    def parse_line_args(self, line: List[TokenInfo]):
+    def _parse_line_args(self, line: List[TokenInfo]):
         arg1 = None
         arg2 = None
         
@@ -198,12 +205,12 @@ class Mia(OperationMixin, IOMixin, RegistersMixin, FlowMixin, ErrorsMixin):
         
         return arg1, arg2
         
-    def create_cmd_list(self, lines: List[List[TokenInfo]]):
+    def _create_cmd_list(self, lines: List[List[TokenInfo]]):
         coms: List[cmd.MiaCommand] = []
         
         for line in lines:
             try:
-                arg1, arg2 = self.parse_line_args(line)
+                arg1, arg2 = self._parse_line_args(line)
                 coms.append(cmd.MiaCommand.factory(self, line[0], arg1, arg2, len(coms)))
             except KeyError:
                 self.print_keyword_error(line[0])
@@ -214,8 +221,8 @@ class Mia(OperationMixin, IOMixin, RegistersMixin, FlowMixin, ErrorsMixin):
         tokens = [k for k in tokens][1:]
         self._tokens = tokens
         
-        lines = self.get_clear_lines(tokens)
-        commands = self.create_cmd_list(lines)
+        lines = self._get_clear_lines(tokens)
+        commands = self._create_cmd_list(lines)
         
         self._cmd_list = commands
         

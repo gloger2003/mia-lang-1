@@ -11,4 +11,3 @@ if len(sys.argv) > 1:
 
 mia = Mia('test.mialang', 10)
 mia.main()
-
