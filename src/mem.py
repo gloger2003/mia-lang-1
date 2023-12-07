@@ -8,7 +8,7 @@ from tokenize import NEWLINE, ENDMARKER, TokenInfo
 from abc import ABC, abstractmethod 
   
 from loguru import logger
-
+import errors
 import commands as cmd
 
 
@@ -19,7 +19,7 @@ class AssocRef:
         self._value = None
         
     def __repr__(self) -> str:
-        return f'AssocRef ref={self._ref} name={self._name} value={self._value}'
+        return f'AssocRef<ref={self._ref} name={self._name} value={self._value}>'
         
     def set_value(self, val):
         self._value = val
@@ -32,7 +32,7 @@ class Memory:
     def __init__(self, size: int = 10):
         assert size % 2 == 0
         self.__size = size
-        self.__buffer: Dict[int, str] = {}
+        self.__buffer: Dict[str, Union[int, float, AssocRef]] = {}
         self.__assoc_buffer: Dict[str, int] = {}
 
         self.fill_memory()
@@ -55,8 +55,8 @@ class Memory:
             assoc.set_value(val)
             logger.success(f'MEMORY::SET_VAL | assoc_ref={assoc_ref} | val={val}')
         else:
-            assert isinstance(self.__buffer[ref], AssocRef)
-            
+            if isinstance(self.__buffer[ref], AssocRef):
+                raise errors.AssociatedAddressError()
             self.__buffer[ref] = val
             logger.success(f'MEMORY::SET_VAL | ref={ref} | val={val}')
         

@@ -1,0 +1,2 @@
+class AssociatedAddressError(Exception):
+    pass

@@ -11,6 +11,7 @@ from abc import ABC, abstractmethod
 from loguru import logger
 
 import mia
+import errors
 import utils
 
 
@@ -27,9 +28,9 @@ class MiaCommand(ABC):
         self._cmd_index = cmd_index
         
         if self.ARG1_REQUERED and self._t_arg1 is None:
-            self._mia.print_error_args(self._t_cmd, self.repr_doc())
+            self._mia.print_args_error(self._t_cmd, self.repr_doc())
         if self.ARG2_REQUERED and self._t_arg2 is None:
-            self._mia.print_error_args(self._t_cmd, self.repr_doc())
+            self._mia.print_args_error(self._t_cmd, self.repr_doc())
     
     def __repr__(self) -> str:
         cmd = self._t_cmd.string
@@ -78,7 +79,10 @@ class AllocCmd(MiaCommand):
     def do(self):
         ref = self.parse_ref(self._t_arg1)
         val = self.parse_value(self._t_arg2)
-        self._mia.set_to_buffer(ref, val)
+        try:
+            self._mia.set_to_buffer(ref, val)
+        except errors.AssociatedAddressError:
+            self._mia.print_assoc_address_error(self._t_cmd, ref)
     
 
 class OutCmd(MiaCommand):

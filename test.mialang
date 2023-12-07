@@ -1,5 +1,6 @@
 assoc 0x1 a
-
 alloc a 10
+
+alloc 0x1 20
 
 out a

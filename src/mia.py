@@ -12,6 +12,7 @@ from loguru import logger
 
 import commands as cmd
 import mem
+import errors
 
 
 class OperationMixin:
@@ -35,6 +36,7 @@ class OperationMixin:
 class ErrorsMixin:
     ARGS_ERROR = '================= ARGS_ERROR ================='
     KEYWORD_ERROR = '================= KEYWORD_ERROR ================='
+    ASSOC_ADDRESS_ERROR = '================= ASSOC_ADDRESS_ERROR ================='
     
     def print_code_before_error(self, index_line_with_error: int):
         cur_line = 0
@@ -80,7 +82,7 @@ class ErrorsMixin:
         self.print_code_after_error(index_line_with_error)
         print('')
     
-    def print_error_args(self, t: TokenInfo, docs: str):
+    def print_args_error(self, t: TokenInfo, docs: str):
         self._print_error(self.ARGS_ERROR, t, docs)
         quit()
         
@@ -96,6 +98,14 @@ class ErrorsMixin:
         )
         docs = ('_' * 50) + '\n' + docs
         self._print_error(self.KEYWORD_ERROR, t, docs)
+        quit()
+
+    def print_assoc_address_error(self, t: TokenInfo, ref: str):
+        docs = '\nВы не можете напрямую записывать в эту область памяти,\n' \
+            'т.к. она ассоциирована с переменной.\n\n'
+        docs += repr(self._memory.get_value(ref))
+        docs += '\n'
+        self._print_error(self.ASSOC_ADDRESS_ERROR, t, docs)
         quit()
 
 
@@ -143,9 +153,9 @@ class RegistersMixin:
 
 class Mia(OperationMixin, IOMixin, RegistersMixin, FlowMixin, ErrorsMixin):
     def __init__(self, filename: str, memory_size: int):
-        self.__filename = filename
-        self.__reader = open(filename, 'rb')
-        self.__memory = mem.Memory(memory_size)
+        self._filename = filename
+        self._reader = open(filename, 'rb')
+        self._memory = mem.Memory(memory_size)
         
         self._cmd_index = 0
         self._def_names: Dict[str, int] = {}
@@ -160,13 +170,13 @@ class Mia(OperationMixin, IOMixin, RegistersMixin, FlowMixin, ErrorsMixin):
         self._def_names[def_name] = cmd_index
         
     def set_to_buffer(self, ref: str, val: Union[int, float]):
-        self.__memory.set_value(ref, val)
+        self._memory.set_value(ref, val)
         
     def create_assoc(self, ref: str, name: str):
-        self.__memory.create_assoc(ref, name)
+        self._memory.create_assoc(ref, name)
         
     def get_from_buffer(self, ref: str) -> Union[int, float]:
-        return self.__memory.get_value(ref)
+        return self._memory.get_value(ref)
         
     def _get_clear_lines(self, tokens: List[TokenInfo]):
         # TODO: refact
@@ -217,7 +227,7 @@ class Mia(OperationMixin, IOMixin, RegistersMixin, FlowMixin, ErrorsMixin):
         return coms
         
     def main(self):
-        tokens = tokenize.tokenize(self.__reader.__next__)
+        tokens = tokenize.tokenize(self._reader.__next__)
         tokens = [k for k in tokens][1:]
         self._tokens = tokens
         
