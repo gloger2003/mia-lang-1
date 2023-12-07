@@ -13,8 +13,9 @@ kwlist = [
 iskeyword = frozenset(kwlist).__contains__
 
 
-if sys.argv[1] == 'clear':
-    logger.remove()
+if len(sys.argv) > 1:
+    if sys.argv[1] == 'clear':
+        logger.remove()
 
 
 mia = Mia('test.mialang', 10)
