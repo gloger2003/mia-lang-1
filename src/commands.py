@@ -23,7 +23,7 @@ class MiaCommand(ABC):
         self._mia = mia
     
     @abstractmethod
-    def do_it(self):
+    def do(self):
         pass
     
     @abstractmethod
@@ -59,7 +59,7 @@ class AllocMiaCommand(MiaCommand):
     def parse_value(self, t: TokenInfo):
         return utils.to_number_value(t)
     
-    def do_it(self):
+    def do(self):
         ref = self.parse_ref(self._t_arg1)
         val = self.parse_value(self._t_arg2)
         self._mia.set_to_buffer(ref, val)
