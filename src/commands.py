@@ -121,14 +121,66 @@ class SumMiaCommand(MiaCommand):
         
         val = self._mia.get_rx()
         self._mia.set_to_buffer(ref, val)
+        
+
+class SubMiaCommand(MiaCommand):
+    """
+    sub -> <ref>
+    >>> sub 0x1
+    """
+    def parse_value(self):
+        return super().parse_value()
+    
+    def do(self):
+        ref = self.parse_ref(self._t_arg1)
+        self._mia.sub_registers()
+        
+        val = self._mia.get_rx()
+        self._mia.set_to_buffer(ref, val)
+        
+        
+class MulMiaCommand(MiaCommand):
+    """
+    mul -> <ref>
+    >>> mul 0x1
+    """
+    def parse_value(self):
+        return super().parse_value()
+    
+    def do(self):
+        ref = self.parse_ref(self._t_arg1)
+        self._mia.mul_registers()
+        
+        val = self._mia.get_rx()
+        self._mia.set_to_buffer(ref, val)
+        
+        
+class DivMiaCommand(MiaCommand):
+    """
+    div -> <ref>
+    >>> div 0x1
+    """
+    def parse_value(self):
+        return super().parse_value()
+    
+    def do(self):
+        ref = self.parse_ref(self._t_arg1)
+        self._mia.div_registers()
+        
+        val = self._mia.get_rx()
+        self._mia.set_to_buffer(ref, val)
 
 
 class MiaCommandsEnum(enum.Enum):
     alloc = 0
-    out = 1
-    ax = 2
-    bx = 3
-    sum = 4
+    out = enum.auto()
+    ax = enum.auto()
+    bx = enum.auto()
+    sum = enum.auto()
+    sub = enum.auto()
+    div = enum.auto()
+    mul = enum.auto()
+    
 
     
 CMD_MAPPING = {
@@ -137,4 +189,7 @@ CMD_MAPPING = {
     MiaCommandsEnum.ax: RegAxMiaCommand,
     MiaCommandsEnum.bx: RegBxMiaCommand,
     MiaCommandsEnum.sum: SumMiaCommand,
+    MiaCommandsEnum.sub: SubMiaCommand,
+    MiaCommandsEnum.div: DivMiaCommand,
+    MiaCommandsEnum.mul: MulMiaCommand,
 } 

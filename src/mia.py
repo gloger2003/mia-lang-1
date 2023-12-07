@@ -16,8 +16,20 @@ import mem
 class OperationMixin:
     def sum_registers(self):
         self._rx = self._ax + self._bx
-        logger.warning(self._rx)
-
+        logger.warning(f'MIA::_RX={self._rx}')
+        
+    def sub_registers(self):
+        self._rx = self._ax - self._bx
+        logger.warning(f'MIA::_RX={self._rx}')
+        
+    def dev_registers(self):
+        self._rx = self._ax / self._bx
+        logger.warning(f'MIA::_RX={self._rx}')
+        
+    def mul_registers(self):
+        self._rx = self._ax * self._bx
+        logger.warning(f'MIA::_RX={self._rx}')
+    
 
 class Mia(OperationMixin):
     def __init__(self, filename: str, memory_size: int):
