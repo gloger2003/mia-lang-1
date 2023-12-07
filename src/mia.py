@@ -48,9 +48,23 @@ class Mia:
         
         coms: List[cmd.MiaCommand] = []
         for line in lines:
-            coms.append(cmd.MiaCommand.factory(self, line[0], line[1], line[2]))
+            arg1 = None
+            arg2 = None
+            
+            # TODO: refact
+            try:
+                arg1 = line[1]
+            except IndexError:
+                pass
+            
+            try:
+                arg2 = line[2]
+            except IndexError:
+                pass
+            
+            coms.append(cmd.MiaCommand.factory(self, line[0], arg1, arg2))
             
         for com in coms:
             com.do()
                 
-        pprint(coms)
+        pprint(coms, width=40)
