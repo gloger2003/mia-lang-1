@@ -203,7 +203,7 @@ class Mia(OperationMixin, IOMixin, RegistersMixin, FlowMixin, ErrorsMixin):
             lines.append(tokens[start:i])
             start = i + 1
         
-        lines = [k for k in lines if k]
+        lines = [k for k in lines if k and k[0].string != '//']
             
         return lines
     
