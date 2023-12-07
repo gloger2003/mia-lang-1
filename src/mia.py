@@ -19,6 +19,9 @@ class Mia:
         self.__reader = open(filename, 'rb')
         self.__memory = mem.Memory(memory_size)
         
+        self._ax = None
+        self._bx = None
+        
         self.main()
         
     def set_to_buffer(self, ref: str, val: Union[int, float]):
@@ -26,6 +29,15 @@ class Mia:
         
     def get_from_buffer(self, ref: str) -> Union[int, float]:
         return self.__memory.get_val(ref)
+    
+    def print_val(self, val):
+        print(f'>>> {val}')
+        
+    def reg_ax(self, val):
+        self._ax = val
+        
+    def reg_bx(self, val):
+        self._bx = val
         
     def main(self):
         tokens = tokenize.tokenize(self.__reader.__next__)

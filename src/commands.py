@@ -74,15 +74,49 @@ class OutMiaCommand(MiaCommand):
     def do(self):
         ref = self.parse_ref(self._t_arg1)
         val = self._mia.get_from_buffer(ref)
-        print(val)
+        self._mia.print_val(val)
+        
+        
+class RegAxMiaCommand(MiaCommand):
+    """
+    ax <ref>
+    >>> ax 0x1
+    """
+    def parse_value(self):
+        return super().parse_value()
+    
+    def do(self):
+        ref = self.parse_ref(self._t_arg1)
+        val = self._mia.get_from_buffer(ref)
+        
+        self._mia.reg_ax(val)
+        
+
+class RegBxMiaCommand(MiaCommand):
+    """
+    bx <ref>
+    >>> bx 0x1
+    """
+    def parse_value(self):
+        return super().parse_value()
+    
+    def do(self):
+        ref = self.parse_ref(self._t_arg1)
+        val = self._mia.get_from_buffer(ref)
+        
+        self._mia.reg_bx(val)
 
 
 class MiaCommandsEnum(enum.Enum):
     alloc = 0
     out = 1
+    ax = 2
+    bx = 3
 
     
 CMD_MAPPING = {
     MiaCommandsEnum.alloc: AllocMiaCommand,
-    MiaCommandsEnum.out: OutMiaCommand
+    MiaCommandsEnum.out: OutMiaCommand,
+    MiaCommandsEnum.ax: RegAxMiaCommand,
+    MiaCommandsEnum.bx: RegBxMiaCommand,
 } 
