@@ -1,19 +1,19 @@
-var 0x1 n 23
+var 0x1 n    23
 var 0x2 fact 1
-var 0x3 i 1
+var 0x3 i    1
 var 0x4 step 1
 
 // func ^^
 defn factorial
-    ax fact
-    bx i
+    ax  fact
+    bx  i
     mul fact
 
-    ax n
+    ax  n
     sub 0x9
 
-    ax i
-    bx step
+    ax  i
+    bx  step
     sum i
 
     out fact
