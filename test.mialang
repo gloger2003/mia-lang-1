@@ -1,17 +1,8 @@
-// array <ref> <name> <length>
+var 0x1 a 10
+alloc 0x2 10
 
-array 0x1 arr 5
-alloc 0x9 2
+ax a
+bx 0x2
+sum 0x9
 
-var 0x9 a 2
-
-DEV_out_buf
-DEV_out_assoc_buf
-
-arxn arr
-arxi a
-push 20
-
-DEV_out_buf
-
-out _arxv
+out 0x9
