@@ -3,8 +3,6 @@ var 0x2 fact 1
 var 0x3 i    1
 var 0x4 step 1
 
-_ax
-
 defn factorial
     ax  fact
     bx  i

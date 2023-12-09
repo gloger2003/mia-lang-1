@@ -21,3 +21,6 @@ defn push_item
     out _arxv
 
 call push_item 0x20 
+
+DEV_out_buf
+DEV_out_assoc_buf
